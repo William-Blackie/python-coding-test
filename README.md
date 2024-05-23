@@ -1,3 +1,27 @@
+# Hello Lantern!
+
+I hope I've approached this task with what you had in mind, I've added some details 
+in the testing approach of how I would approach this with more time as well as some 
+notes of where I'm trying to mock a system as close to a production ready setup
+without containerizing and creating interfaces for the services for dependency injection.
+
+Here are a few of the test URLs to verify the implementation:
+```
+http://127.0.0.1:8000/compare?company_name=HealthInc&pdf=healthinc
+
+http://127.0.0.1:8000/compare?company_name=FinanceLLC&pdf=financellc
+
+http://127.0.0.1:8000/compare?company_name=RetailCo&pdf=retailco
+
+```
+Here's a screenshot of the output, displaying the current values held by the "DB", 
+compared to the new values of the PDF, marked with true or false if it matches.
+
+![example output](image.png)
+
+Looking forward to speaking with you soon, if you have any questions please
+ email me at at [will@developerfy.com](mailto:will@developerfy.com)
+
 # Data discrepancy checker
 
 This task mirrors a system we recently built internally, and will give you an

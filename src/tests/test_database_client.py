@@ -8,7 +8,7 @@ class TestDatabaseClient(unittest.TestCase):
         # Create a test instance of the DatabaseClient
         # For simplicity, we are using the same CSV file for testing
         # In a real-world scenario, you would use different test data
-        # and possible a strategy pattern for the Client to mock with code rather than fixtures.
+        # and possibly a strategy pattern for the Client to mock with code rather than fixtures.
         self.db_client = DatabaseClient("data/database.csv")
         self.expected_data = {
             "Company Name": "HealthInc",
@@ -35,9 +35,7 @@ class TestDatabaseClient(unittest.TestCase):
         """
         Test getting data for an existing company.
         """
-        company_name = "HealthInc"
-
-        result = self.db_client.get_by_company_name(company_name)
+        result = self.db_client.get_by_company_name("HealthInc")
         self.assertEqual(result, self.expected_data)
 
     def test_get_by_company_name_non_existing(self):
