@@ -1,4 +1,4 @@
-# Mapping of CSV column names to Pydantic Company model field names
+# Mapping of CSV column names to Company model field names
 CSV_TO_COMPANY_FIELD_MAPPING = {
     "Company Name": "company_name",
     "Industry": "industry",
@@ -16,5 +16,8 @@ CSV_TO_COMPANY_FIELD_MAPPING = {
     "ROA (Return on Assets) (%)": "roa_percent",
     "Current Ratio": "current_ratio",
     "Debt to Equity Ratio": "debt_to_equity_ratio",
-    "Location": "location"
+    "Location": "location",
+    "CEO": "ceo",
+    "Number of Employees": "number_of_employees",
+    "Current Ratio": "current_ratio"
 }

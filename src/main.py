@@ -5,13 +5,18 @@ from src.models import Company
 import os
 from dotenv import load_dotenv
 from src.database import DatabaseClient
+from fastapi import Depends
 
 load_dotenv()  # take environment variables from .env. mimicking the environment variables set in a Docker container/EC2/K8s or etc
 
 API_KEY = os.environ["API_KEY"]
 
-db_client = DatabaseClient('data/database.csv')
-pdf_service = PdfService(API_KEY)
+# Dependency Injection
+def get_db_client() -> DatabaseClient:
+    return DatabaseClient('data/database.csv')
+
+def get_pdf_service() -> PdfService:
+    return PdfService(API_KEY)
 
 app = FastAPI()
 
@@ -23,7 +28,10 @@ def health_check() -> dict[str, str]:
     return {"Hello": "World"}
 
 @app.get("/compare")
-def compare(company_name: str, pdf: str) -> dict[str, str]:
+def compare(company_name: str, pdf: str, 
+    db_client: DatabaseClient = Depends(get_db_client), 
+    pdf_service: PdfService = Depends(get_pdf_service)
+            ) -> dict[str, dict[str, Any]]:
     """
     A simple endpoint that compares the data extracted from a PDF with the data stored in the database.
 
@@ -37,12 +45,12 @@ def compare(company_name: str, pdf: str) -> dict[str, str]:
         
         # Get the company data from the database
         company_data = db_client.get_by_company_name(company_name=company_name)
-    
-        # Compare the extracted data with the data from the database
-        comparison = {key: (pdf_data.get(key), company_data.get(key)) for key in set(pdf_data) | set(company_data)}
-    
+
+        # Initialize Company objects with the extracted data
+        current_company = Company(company_data)
+        new_company = Company(csv_data=pdf_data)
+
         # Return a summary of the data, noting which fields did not match
-        summary = {key: 'Match' if comparison[key][0] == comparison[key][1] else 'Mismatch' for key in comparison}
-        return summary
+        return current_company.compare(new_company)
     except (FileNotFoundError, ValueError, LookupError) as e:
         raise HTTPException(status_code=400, detail=str(e))

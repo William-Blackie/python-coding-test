@@ -29,6 +29,6 @@ class DatabaseClient:
             company_name (str): the name of a company to search.
         """
         for row in self.data:
-            if row['Company Name'] == company_name:
+            if row['Company Name'].lower() == company_name.lower():
                 return row
-        return LookupError(f"Company {company_name} not found in the database")
+        raise LookupError(f"Company {company_name} not found in the database")

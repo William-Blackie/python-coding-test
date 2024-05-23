@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 from pydantic import BaseModel, Field
 from src.constants import CSV_TO_COMPANY_FIELD_MAPPING
 
@@ -20,7 +20,7 @@ class Company(BaseModel):
     ebitda_margin_percent: float
     roe_percent: float
     roa_percent: float
-    current_ratio: float = Field(default=0, title="Current Ratio") # Not included in one of the CSV rows
+    current_ratio: float = Field(default=0.0, title="Current Ratio") # Not included in one of the CSV rows
     debt_to_equity_ratio: float
     location: str
     ceo: str = Field(default="Unknown", title="CEO") # Not included in all of the CSV rows
@@ -54,27 +54,27 @@ class Company(BaseModel):
         data = {}
         try:
             for csv_key, model_key in CSV_TO_COMPANY_FIELD_MAPPING.items():
+                if csv_key not in csv_data:
+                    # Skip fields that are not present in the CSV data
+                    # Let the model handle the default values
+                    continue
                 data[model_key] = csv_data.get(csv_key)
-        except AttributeError as e:
+        except ValueError as e:
             raise ValueError(f"Error loading CSV data: {e}")
         return data
     
-    def compare_csv_data(self, other: BaseModel) -> dict:
-        """
-        Compare two Company instances and return a dictionary of differences.
-        """
-        self_dict = self.model_dump()
-        other_dict = other.model_dump()
+    def compare(self, other: 'Company') -> Dict[str, dict[str, Any]]:
 
-        diff_dict = {}
-
-        for key in set(self_dict.keys()) | set(other_dict.keys()):
-            self_value = self_dict.get(key)
-            other_value = other_dict.get(key)
-
-            if isinstance(self_value, (int, float)) and isinstance(other_value, (int, float)):
-                diff_dict[key] = self_value - other_value
-            elif self_value != other_value:
-                diff_dict[key] = (self_value, other_value)
-
-        return diff_dict
+        if not isinstance(other, Company):
+            raise TypeError("Can only compare with another Company instance")
+        
+        differences = {}
+        for field in self.model_fields:
+            try: 
+                self_value = getattr(self, field)
+                other_value = getattr(other, field)
+                differences[field] = {"Current": self_value, "New": other_value, "Match": self_value == other_value}  
+            except AttributeError as e:
+                print(f"Attribute {field} not found in the model fields: {e}")
+                continue      
+        return differences
