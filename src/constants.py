@@ -19,5 +19,5 @@ CSV_TO_COMPANY_FIELD_MAPPING = {
     "Location": "location",
     "CEO": "ceo",
     "Number of Employees": "number_of_employees",
-    "Current Ratio": "current_ratio"
+    "Current Ratio": "current_ratio",
 }
